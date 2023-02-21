@@ -20,7 +20,7 @@ def add(x, y):
         Sum of x + y
     """
     ### BEGIN YOUR CODE
-    pass
+    return x + y
     ### END YOUR CODE
 
 
@@ -82,7 +82,9 @@ def softmax_loss(Z, y):
         Average softmax loss over the sample.
     """
     ### BEGIN YOUR CODE
-    pass
+    Z_y = Z[np.arange(Z.shape[0]), y]
+    Z_sum = np.log(np.exp(Z).sum(axis=1))
+    return np.mean(Z_sum - Z_y)
     ### END YOUR CODE
 
 
@@ -105,7 +107,22 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
+    num_examples = X.shape[0]
+    for i in range(num_examples // batch + 1):
+        j = min((i+1) * batch, num_examples)
+        X_b = X[i*batch: j]
+        y_b = y[i*batch: j]
+        m = j - i*batch
+        if m == 0:
+            break
+        X_exp = np.exp(X_b @ theta)
+        exp_sum = X_exp.sum(axis=1)
+        # RESHAPE!!!
+        Z = X_exp / exp_sum.reshape(m, 1) # num_examples * num_classes
+        I = np.zeros_like(Z)
+        I[np.arange(Z.shape[0]), y_b] = 1
+        grad = X_b.T @ (Z - I) / Z.shape[0]
+        theta[:, :] -= lr * grad
     ### END YOUR CODE
 
 
