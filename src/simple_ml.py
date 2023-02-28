@@ -47,7 +47,6 @@ def parse_mnist(image_filename, label_filename):
                 labels of the examples.  Values should be of type np.uint8 and
                 for MNIST will contain the values 0-9.
     """
-    ### BEGIN YOUR CODE
     with gzip.open(image_filename, 'rb') as f:
         file_content = f.read()
         # use big-endian!
@@ -63,7 +62,6 @@ def parse_mnist(image_filename, label_filename):
     
     X = X / 255.0
     return X, y
-    ### END YOUR CODE
 
 
 def softmax_loss(Z, y):
@@ -109,19 +107,23 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
     ### BEGIN YOUR CODE
     num_examples = X.shape[0]
     for i in range(num_examples // batch + 1):
+        # 采样batch
         j = min((i+1) * batch, num_examples)
         X_b = X[i*batch: j]
         y_b = y[i*batch: j]
         m = j - i*batch
         if m == 0:
             break
+
+        # 计算梯度
         X_exp = np.exp(X_b @ theta)
         exp_sum = X_exp.sum(axis=1)
-        # RESHAPE!!!
-        Z = X_exp / exp_sum.reshape(m, 1) # num_examples * num_classes
+        Z = X_exp / exp_sum.reshape(m, 1)
         I = np.zeros_like(Z)
         I[np.arange(Z.shape[0]), y_b] = 1
-        grad = X_b.T @ (Z - I) / Z.shape[0]
+        grad = X_b.T @ (Z - I) / Z.shape[0] # grad即梯度
+
+        # 用梯度来更新参数（梯度下降）
         theta[:, :] -= lr * grad
     ### END YOUR CODE
 
