@@ -152,23 +152,28 @@ def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
     """
     ### BEGIN YOUR CODE
     for i in range(X.shape[0] // batch + 1):
+        # 采样batch
         start, end = i * batch, min((i+1)*batch, X.shape[0])
         m = end - start
         if m == 0:
             break
         Xb, yb = X[start:end], y[start:end]
+
+        # 算梯度
         Z1 = Xb@W1
         A1 = np.maximum(Z1, 0)
         H = np.exp(A1 @ W2)
         H /= H.sum(axis=1).reshape(m, 1)
         I = np.zeros_like(H)
         I[np.arange(m), yb] = 1
-        dW2 = A1.T @ (H - I)
+        dW2 = A1.T @ (H - I) # W2的梯度
         I1 = np.zeros_like(Z1)
         I1[Z1 > 0] = 1
-        dW1 = Xb.T @ (((H - I) @ W2.T) * I1)
-        W1[:, :] -= lr / m * dW1
-        W2[:, :] -= lr / m * dW2
+        dW1 = Xb.T @ (((H - I) @ W2.T) * I1) # W1的梯度
+
+        # 用梯度更新参数（梯度下降）
+        W1[:, :] -= lr / m * dW1 # 更新W1
+        W2[:, :] -= lr / m * dW2 # 更新W2
     ### END YOUR CODE
 
 
